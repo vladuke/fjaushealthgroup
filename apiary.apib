@@ -1,0 +1,1560 @@
+FORMAT: 1A
+HOST: https://healthgroup.fjaus.com
+
+# FJA US Health Group Reference API
+
+The API allows view only access to the Group information for Health Insurance clients. 
+It is designed to have predictable, resource-oriented URLs and to use HTTP response codes to indicate API errors. 
+The API relies on the built-in HTTP features e.g. HTTP authentication, HTTP verbs, HTTP headers, etc. 
+
+Authentication
+
+Based on configuration API users may be required to obtain an authentication token by passing user ID and password to FJA-US IPL Security application via its own REST API. Prior to receiving  a token the user must be created and configured in IPL Security. 
+The token must be subsequently used on all API requeests. The tokens have expiration time which is a configurable parameter in IPL Secuirity.
+THe system does not allow multiple tokens per single user ID.
+
+# Group API Root [/]
+
+This resource does not have any attributes. Instead it offers the initial
+API affordances in the form of the links in the JSON body.
+
+It is recommend to follow the “url” link values,
+[Link](https://tools.ietf.org/html/rfc5988) or Location headers where
+applicable to retrieve resources. Instead of constructing your own URLs,
+to keep your client decoupled from implementation details.
+
+## Retrieve the Entry Point [GET]
+
++ Response 200 (application/json)
+
+        {
+            "groups_url": "/groups"
+        }
+
+## Group Group
+
+Resources related to in the API.
+
+## Group Collection [/groups?groupNum%3d{groupNum}%26groupName%3d{groupName}%26serviceDate%3d{serviceDate}%26asOfDate%3d{asOfDate}%26subgroupNum%3d{subgroupNum}%26subgroupName%3d{subgroupName}%26sectionCode%3d{sectionCode}%26packageCode%3d{packageCode}%26page%3d{page}]
+
+Retrieve groups matching the search criteria which must include either the group number or the group name.
+The return result is compatible with [Group Health: Search JSON schema](http://healthgroup.fjaus.com/schema/group/search) [ http://healthgroup.fjaus.com/schema/group/search ]
+
++ Parameters
+    + groupNum: `00801234` (optional, string) - the group number 
+    + groupName: `Some` (optional, string) - the group name
+    + serviceDate: `2015-05-01` (optional, string) - the service date 
+    + asOfDate: `2015-05-01` (optional, string) - the as-of date
+    + subgroupNum: `001` (optional, string) - the subgroup number
+    + subgroupName: `Test sub` (optional, string) - the subgroup name
+    + sectionCode: `010` (optional, string) - the section code, it is applicable for some market segments
+    + packageCode: `020` (optional, string) - the pacakge code, it is applicable for some market segments
+    + page: `1` (optional, number) - the page number of the results to render
+
+
+### List Groups matching search criteria [GET]
+
++ Response 200 (application/json)
+
+    + Headers
+
+            Link: </group?groupNo=01081234&page=2>; rel="next"
+
+    + Body
+
+            [
+                {
+                    "groupName": "Test group",
+                    "groupNum": "01081234",
+                    "address": "123 Main St. Smallville, USA",
+                    "marketSegmentCode": 
+                    {
+                        "acronym": "Small",
+                        "name": "Small",
+                        "shortText": "Small"
+                    },
+                    "status": 
+                    {
+                        "acronym": "Prod",
+                        "name": "Production",
+                        "shortText": "Production"
+                    }
+                }
+            ]
+            
++ Response 404
+
+    + Headers
+    
+            X-PlanGroupService-Error-Cause: potential cause of the error
+
++ Response 500
+
+    + Headers
+    
+            X-PlanGroupService-Error-Cause: potential cause of the error
+
+## Group Subgroups [/groups/{groupNum}/subgroups?%26groupId%3d{groupId}%26%26serviceDate%3d{serviceDate}%26asOfDate%3d{asOfDate}%26subgroupNum%3d{subgroupNum}%26subgroupName%3d{subgroupName}]
+
+Retrieve list of subgroups for the provided group.
+
++ Parameters
+    + groupNum: `00801234`-  the group number 
+    + subgroupNum: `001` (optional, string) - the subgroup number
+    + subgroupName: `Test sub` (optional, string) - the subgroup name
+    + serviceDate: `2015-05-01` (optional, string) - the service date 
+    + asOfDate: `2015-05-01` (optional, string) - the as-of date
+
+
+### List Groups matching search criteria [GET]
+
++ Response 200 (application/json)
+
+    + Headers
+    + Body
+
+            [{
+                    "@groupNumPrefix" : "0081064",
+                    "@subgroupNumber" : "080",
+                    "@subgroupName" : "UNTRACHT EARLY MANAGEMENT INC.",
+                    "@active__health" : "Yes",
+                    "@active__dental" : "No",
+                    "@retiree__health" : "No",
+                    "@retiree__dental" : "No",
+                    "@cobra" : "No",
+                    "@dep31" : "No",
+                    "groupId" : "1917",
+                    "subgroupId" : "431816",
+                    "subgroupStatus" : {
+                        "@value" : "Active",
+                        "@name" : "Active",
+                        "@text" : "Active"
+                    },
+                    "effectiveDate" : {
+                        "@year" : "2013",
+                        "@month" : "1",
+                        "@day" : "1"
+                    }
+                }, {
+                    "@groupNumPrefix" : "0081064",
+                    "@subgroupNumber" : "005",
+                    "@subgroupName" : "Untracht Early Management INC. - Dep to 30",
+                    "@active__health" : "No",
+                    "@active__dental" : "No",
+                    "@retiree__health" : "No",
+                    "@retiree__dental" : "No",
+                    "@cobra" : "No",
+                    "@dep31" : "Yes",
+                    "groupId" : "1917",
+                    "subgroupId" : "13005",
+                    "subgroupStatus" : {
+                        "@value" : "Active",
+                        "@name" : "Active",
+                        "@text" : "Active"
+                    },
+                    "effectiveDate" : {
+                        "@year" : "2010",
+                        "@month" : "1",
+                        "@day" : "1"
+                    }
+                }, {
+                    "@groupNumPrefix" : "0081064",
+                    "@subgroupNumber" : "000",
+                    "@subgroupName" : "UNTRACHT EARLY MANAGEMENT INC.",
+                    "@active__health" : "Yes",
+                    "@active__dental" : "No",
+                    "@retiree__health" : "No",
+                    "@retiree__dental" : "No",
+                    "@cobra" : "No",
+                    "@dep31" : "No",
+                    "groupId" : "1917",
+                    "subgroupId" : "5081",
+                    "subgroupStatus" : {
+                        "@value" : "Active",
+                        "@name" : "Active",
+                        "@text" : "Active"
+                    },
+                    "effectiveDate" : {
+                        "@year" : "2009",
+                        "@month" : "7",
+                        "@day" : "11"
+                    }
+                }
+            ]
+
++ Response 404
+
+    + Headers
+    
+            X-PlanGroupService-Error-Cause: potential cause of the error
+
++ Response 500
+
+    + Headers
+    
+            X-PlanGroupService-Error-Cause: potential cause of the error
+    
+
+## Group [/groups/{groupNum}/subgroups/{subgroupNum}?%26groupId%3d{groupId}%26%26serviceDate%3d{serviceDate}%26asOfDate%3d{asOfDate}]
+
+The Group object has the following attributes:
+
++ group header
++ subgroup data  
+    + addresses
+    + contacts
+    + offers
+    + planStubs
+    + transaction
+
+The response is complaint with [Group Health: Group JSON schema](http://healthgroup.fjaus.com/schema/group) [ http://healthgroup.fjaus.com/schema/group ]
+
++ Parameters
+    + groupNum: `01081234` (required, string) - the group number 
+    + subgroupNum: `001` (required, string) - the subgroup number
+
+### View a Group Detail [GET]
+
++ Response 200 (application/json)
+
+        {
+            "@groupName" : "SPORTS ARENA EMPLOYEES LOCAL 137 WF",
+            "@groupNum" : "0085850",
+            "@legalName4Contract" : "SPORTS ARENA EMPLOYEES LOCAL 137 WF",
+            "groupStatus" : {
+                "@value" : "Prod",
+                "@name" : "Prod",
+                "@text" : "Prod"
+            },
+            "marketSegmentCode" : {
+                "@value" : "Labor",
+                "@name" : "Labor",
+                "@text" : "Labor"
+            },
+            "grpOrigEffDate" : {
+                "@year" : "2012",
+                "@month" : "2",
+                "@day" : "1"
+            },
+            "addresses" : [{
+                    "@line1" : "1845 WALNUT ST. 14TH FL",
+                    "@line2" : "14TH FL",
+                    "@city" : "PHILADELPHIA",
+                    "@state" : "PA",
+                    "@zip5" : "19103",
+                    "@county" : "PAPhiladelphia",
+                    "@addressType" : "Broker"
+                }, {
+                    "@line1" : "121 E 24th Street 8th FL",
+                    "@city" : "New York",
+                    "@state" : "NY",
+                    "@zip5" : "10010",
+                    "@county" : "NY - New York",
+                    "@addressType" : "Physical"
+                }
+            ],
+            "departments" : [],
+            "contacts" : {
+                "broker" : {
+                    "@salutation" : "Mr",
+                    "@firstName" : "Mark",
+                    "@lastName" : "Cesarano",
+                    "contactType" : {
+                        "@value" : "Broker",
+                        "@name" : "Broker",
+                        "@text" : "Broker"
+                    },
+                    "legalEntityType" : {
+                        "@value" : "Person",
+                        "@name" : "Person",
+                        "@text" : "Person"
+                    },
+                    "communications" : [{
+                            "communicationType" : {
+                                "@value" : "CellPhone",
+                                "@name" : "CellPhone",
+                                "@text" : "CellPhone"
+                            }
+                        }, {
+                            "@contactNumber" : "nobroker@gei.com",
+                            "communicationType" : {
+                                "@value" : "Email",
+                                "@name" : "Email",
+                                "@text" : "Email"
+                            }
+                        }, {
+                            "@contactNumber" : "2155639943",
+                            "communicationType" : {
+                                "@value" : "Fax",
+                                "@name" : "Fax",
+                                "@text" : "Fax"
+                            }
+                        }, {
+                            "communicationType" : {
+                                "@value" : "HomePhone",
+                                "@name" : "HomePhone",
+                                "@text" : "HomePhone"
+                            }
+                        }, {
+                            "@contactNumber" : "2158254028",
+                            "communicationType" : {
+                                "@value" : "WorkPhone",
+                                "@name" : "WorkPhone",
+                                "@text" : "WorkPhone"
+                            }
+                        }
+                    ],
+                    "agencyName" : "THE SAVITZ ORGANIZATION",
+                    "commissionType" : {
+                        "@value" : "NonStandard",
+                        "@name" : "NonStandard",
+                        "@text" : "NonStandard"
+                    },
+                    "comment" : "Flat 4%"
+                },
+                "billing" : [{
+                        "@salutation" : "Ms",
+                        "@firstName" : "Jean",
+                        "@lastName" : "Fairchild",
+                        "contactType" : {
+                            "@value" : "Billing",
+                            "@name" : "Billing",
+                            "@text" : "Billing"
+                        },
+                        "legalEntityType" : {
+                            "@value" : "Person",
+                            "@name" : "Person",
+                            "@text" : "Person"
+                        },
+                        "communications" : [{
+                                "@contactNumber" : "2129253706",
+                                "communicationType" : {
+                                    "@value" : "WorkPhone",
+                                    "@name" : "WorkPhone",
+                                    "@text" : "WorkPhone"
+                                }
+                            }, {
+                                "communicationType" : {
+                                    "@value" : "HomePhone",
+                                    "@name" : "HomePhone",
+                                    "@text" : "HomePhone"
+                                }
+                            }, {
+                                "@contactNumber" : "2129669156",
+                                "communicationType" : {
+                                    "@value" : "Fax",
+                                    "@name" : "Fax",
+                                    "@text" : "Fax"
+                                }
+                            }, {
+                                "@contactNumber" : "administrator@local108funds.com",
+                                "communicationType" : {
+                                    "@value" : "Email",
+                                    "@name" : "Email",
+                                    "@text" : "Email"
+                                }
+                            }, {
+                                "communicationType" : {
+                                    "@value" : "CellPhone",
+                                    "@name" : "CellPhone",
+                                    "@text" : "CellPhone"
+                                }
+                            }
+                        ],
+                        "billingFrequency" : {
+                            "@value" : "Monthly",
+                            "@name" : "Monthly",
+                            "@text" : "Monthly"
+                        },
+                        "billingMethod" : {
+                            "@value" : "Traditional",
+                            "@name" : "Traditional",
+                            "@text" : "Traditional"
+                        },
+                        "billingRoute" : {
+                            "@value" : "MailDirectlyToGroup",
+                            "@name" : "MailDirectlyToGroup",
+                            "@text" : "MailDirectlyToGroup"
+                        },
+                        "billingSequence" : {
+                            "@value" : "Alpha",
+                            "@name" : "Alpha",
+                            "@text" : "Alpha"
+                        },
+                        "ssnMaskType" : {
+                            "@value" : "Partially",
+                            "@name" : "Partially",
+                            "@text" : "Partially"
+                        },
+                        "paymentMethod" : {
+                            "@value" : "MailCheck",
+                            "@name" : "MailCheck",
+                            "@text" : "MailCheck"
+                        }
+                    }, {
+                        "@salutation" : "Ms",
+                        "@firstName" : "Lynn",
+                        "@lastName" : "Niblick",
+                        "contactType" : {
+                            "@value" : "Billing",
+                            "@name" : "Billing",
+                            "@text" : "Billing"
+                        },
+                        "legalEntityType" : {
+                            "@value" : "Person",
+                            "@name" : "Person",
+                            "@text" : "Person"
+                        },
+                        "communications" : [{
+                                "communicationType" : {
+                                    "@value" : "CellPhone",
+                                    "@name" : "CellPhone",
+                                    "@text" : "CellPhone"
+                                }
+                            }, {
+                                "@contactNumber" : "8566658033",
+                                "communicationType" : {
+                                    "@value" : "WorkPhone",
+                                    "@name" : "WorkPhone",
+                                    "@text" : "WorkPhone"
+                                }
+                            }, {
+                                "communicationType" : {
+                                    "@value" : "HomePhone",
+                                    "@name" : "HomePhone",
+                                    "@text" : "HomePhone"
+                                }
+                            }, {
+                                "@contactNumber" : "8566658712",
+                                "communicationType" : {
+                                    "@value" : "Fax",
+                                    "@name" : "Fax",
+                                    "@text" : "Fax"
+                                }
+                            }, {
+                                "communicationType" : {
+                                    "@value" : "Email",
+                                    "@name" : "Email",
+                                    "@text" : "Email"
+                                }
+                            }
+                        ],
+                        "billingFrequency" : {
+                            "@value" : "Monthly",
+                            "@name" : "Monthly",
+                            "@text" : "Monthly"
+                        },
+                        "billingMethod" : {
+                            "@value" : "Traditional",
+                            "@name" : "Traditional",
+                            "@text" : "Traditional"
+                        },
+                        "billingRoute" : {
+                            "@value" : "MailDirectlyToGroup",
+                            "@name" : "MailDirectlyToGroup",
+                            "@text" : "MailDirectlyToGroup"
+                        },
+                        "billingSequence" : {
+                            "@value" : "Alpha",
+                            "@name" : "Alpha",
+                            "@text" : "Alpha"
+                        },
+                        "ssnMaskType" : {
+                            "@value" : "None",
+                            "@name" : "None",
+                            "@text" : "None"
+                        },
+                        "paymentMethod" : {
+                            "@value" : "MailCheck",
+                            "@name" : "MailCheck",
+                            "@text" : "MailCheck"
+                        }
+                    }
+                ],
+                "contact" : [{
+                        "@salutation" : "Ms",
+                        "@firstName" : "Lynn",
+                        "@lastName" : "Niblick",
+                        "@title" : "BENEFITS MANAGER",
+                        "contactType" : {
+                            "@value" : "Contact",
+                            "@name" : "Contact",
+                            "@text" : "Contact"
+                        },
+                        "legalEntityType" : {
+                            "@value" : "Person",
+                            "@name" : "Person",
+                            "@text" : "Person"
+                        },
+                        "communications" : [{
+                                "communicationType" : {
+                                    "@value" : "CellPhone",
+                                    "@name" : "CellPhone",
+                                    "@text" : "CellPhone"
+                                }
+                            }, {
+                                "@contactNumber" : "8566658712",
+                                "communicationType" : {
+                                    "@value" : "Fax",
+                                    "@name" : "Fax",
+                                    "@text" : "Fax"
+                                }
+                            }, {
+                                "@contactNumber" : "LNiblick137@comcast.net",
+                                "communicationType" : {
+                                    "@value" : "Email",
+                                    "@name" : "Email",
+                                    "@text" : "Email"
+                                }
+                            }, {
+                                "@contactNumber" : "8566658033",
+                                "communicationType" : {
+                                    "@value" : "WorkPhone",
+                                    "@name" : "WorkPhone",
+                                    "@text" : "WorkPhone"
+                                }
+                            }, {
+                                "communicationType" : {
+                                    "@value" : "HomePhone",
+                                    "@name" : "HomePhone",
+                                    "@text" : "HomePhone"
+                                }
+                            }
+                        ]
+                    }, {
+                        "@salutation" : "Ms",
+                        "@firstName" : "Jean",
+                        "@lastName" : "Fairchild",
+                        "@title" : "Fund Manager",
+                        "contactType" : {
+                            "@value" : "Contact",
+                            "@name" : "Contact",
+                            "@text" : "Contact"
+                        },
+                        "legalEntityType" : {
+                            "@value" : "Person",
+                            "@name" : "Person",
+                            "@text" : "Person"
+                        },
+                        "communications" : [{
+                                "@contactNumber" : "2129253706",
+                                "communicationType" : {
+                                    "@value" : "WorkPhone",
+                                    "@name" : "WorkPhone",
+                                    "@text" : "WorkPhone"
+                                }
+                            }, {
+                                "communicationType" : {
+                                    "@value" : "HomePhone",
+                                    "@name" : "HomePhone",
+                                    "@text" : "HomePhone"
+                                }
+                            }, {
+                                "@contactNumber" : "2129669156",
+                                "communicationType" : {
+                                    "@value" : "Fax",
+                                    "@name" : "Fax",
+                                    "@text" : "Fax"
+                                }
+                            }, {
+                                "@contactNumber" : "administrator@local108funds.com",
+                                "communicationType" : {
+                                    "@value" : "Email",
+                                    "@name" : "Email",
+                                    "@text" : "Email"
+                                }
+                            }, {
+                                "communicationType" : {
+                                    "@value" : "CellPhone",
+                                    "@name" : "CellPhone",
+                                    "@text" : "CellPhone"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            },
+            "planStubs" : [{
+                    "@proxyPlanId" : "0951580082",
+                    "@planName" : "Advantage EPO Advantage EPO 3 G8292 0951580082",
+                    "@alphaPrefix" : "YKL",
+                    "@planPk" : "227059761",
+                    "@planId" : "0951580082",
+                    "productType" : {
+                        "@value" : "AdvantageEPO",
+                        "@name" : "AdvantageEPO",
+                        "@text" : "AdvantageEPO"
+                    },
+                    "planStatus" : {
+                        "@value" : "Production",
+                        "@name" : "Production",
+                        "@text" : "Production"
+                    },
+                    "planDesign" : {
+                        "@value" : "AdvantageEPO3",
+                        "@name" : "AdvantageEPO3",
+                        "@text" : "AdvantageEPO3"
+                    },
+                    "lob" : {
+                        "@value" : "Health",
+                        "@name" : "Health",
+                        "@text" : "Health"
+                    },
+                    "marketSegmentCode" : {
+                        "@value" : "Labor",
+                        "@name" : "Labor",
+                        "@text" : "Labor"
+                    },
+                    "coverageCodes" : {
+                        "coverageCode" : {
+                            "@covCode" : "G8292",
+                            "@carveOutCode" : "G8293"
+                        }
+                    }
+                }
+            ],
+            "offers" : [{
+                    "@offerName" : "Adv EPO 3/Subgroups 010,011,012,013,016,017",
+                    "@cdhInd" : "false",
+                    "@anocInd" : "false",
+                    "@privateExchInd" : "false",
+                    "lastModifiedDate" : "02/02/2015",
+                    "offerType" : {
+                        "@value" : "Health",
+                        "@name" : "Health",
+                        "@text" : "Health"
+                    },
+                    "offerStatus" : {
+                        "@value" : "Assigned",
+                        "@name" : "Assigned",
+                        "@text" : "Assigned"
+                    },
+                    "offerFundingCode" : {
+                        "@value" : "FullyInsured",
+                        "@name" : "FullyInsured",
+                        "@text" : "FullyInsured"
+                    },
+                    "offerReligiousEmplInd" : "false",
+                    "preExistingInd" : "false",
+                    "hlaInd" : "false",
+                    "rateCapInd" : "false",
+                    "fsaInd" : "false",
+                    "pdpOnlyInd" : "false",
+                    "offerToLobs" : [{
+                            "lob" : {
+                                "@value" : "PrescriptionPlan",
+                                "@name" : "PrescriptionPlan",
+                                "@text" : "PrescriptionPlan"
+                            },
+                            "apSelectedInd" : "false",
+                            "timelyFiling" : {
+                                "@value" : "18months",
+                                "@name" : "18months",
+                                "@text" : "18months"
+                            }
+                        }, {
+                            "lob" : {
+                                "@value" : "Health",
+                                "@name" : "Health",
+                                "@text" : "Health"
+                            },
+                            "apSelectedInd" : "false",
+                            "accRatingMethodCode" : {
+                                "@value" : "ProspectiveRating",
+                                "@name" : "ProspectiveRating",
+                                "@text" : "ProspectiveRating"
+                            },
+                            "alphaPrefix" : "YKL",
+                            "timelyFiling" : {
+                                "@value" : "18months",
+                                "@name" : "18months",
+                                "@text" : "18months"
+                            }
+                        }
+                    ],
+                    "coordinationOfBenefits" : {
+                        "coordinationOfBenefits" : {
+                            "lob" : {
+                                "@value" : "Health",
+                                "@name" : "Health",
+                                "@text" : "Health"
+                            },
+                            "cob" : {
+                                "@value" : "Standard",
+                                "@name" : "Standard",
+                                "@text" : "Standard"
+                            },
+                            "dualCoverageInd" : "false",
+                            "cobAdmin" : {
+                                "@value" : "PayAndPursue",
+                                "@name" : "PayAndPursue",
+                                "@text" : "PayAndPursue"
+                            },
+                            "cobInitInfo" : {
+                                "@value" : "InitialApplication",
+                                "@name" : "InitialApplication",
+                                "@text" : "InitialApplication"
+                            },
+                            "cobRule" : {
+                                "@value" : "Birthday",
+                                "@name" : "Birthday",
+                                "@text" : "Birthday"
+                            },
+                            "medicareCOB" : {
+                                "@value" : "Standard",
+                                "@name" : "Standard",
+                                "@text" : "Standard"
+                            },
+                            "benefitReserveInd" : "false"
+                        }
+                    },
+                    "healthReward" : {
+                        "bridgesToExcellenceInd" : "false",
+                        "nurseLineInd" : "false",
+                        "preventativeHealthReminderInd" : "false",
+                        "preciousAdditionsInd" : "false",
+                        "journeyToHealthInd" : "false",
+                        "hhrInd" : "false"
+                    },
+                    "licsCodes" : [],
+                    "plan2Rates" : [{
+                            "ratePlanType" : {
+                                "@value" : "PrescriptionPlan",
+                                "@name" : "PrescriptionPlan",
+                                "@text" : "PrescriptionPlan"
+                            },
+                            "rates" : []
+                        }, {
+                            "planRateStructureLevel" : {
+                                "@value" : "4RateStructure",
+                                "@name" : "4RateStructure",
+                                "@text" : "4RateStructure"
+                            },
+                            "ratePlanType" : {
+                                "@value" : "HealthCarveout",
+                                "@name" : "HealthCarveout",
+                                "@text" : "HealthCarveout"
+                            },
+                            "rates" : [{
+                                    "coverageLevel" : {
+                                        "@value" : "ParentAndChildren",
+                                        "@name" : "ParentAndChildren",
+                                        "@text" : "ParentAndChildren"
+                                    },
+                                    "rate" : "0.01"
+                                }, {
+                                    "coverageLevel" : {
+                                        "@value" : "Family",
+                                        "@name" : "Family",
+                                        "@text" : "Family"
+                                    },
+                                    "rate" : "0.01"
+                                }, {
+                                    "coverageLevel" : {
+                                        "@value" : "2Adults",
+                                        "@name" : "2Adults",
+                                        "@text" : "2Adults"
+                                    },
+                                    "rate" : "0.01"
+                                }, {
+                                    "coverageLevel" : {
+                                        "@value" : "Single",
+                                        "@name" : "Single",
+                                        "@text" : "Single"
+                                    },
+                                    "rate" : "0.01"
+                                }
+                            ],
+                            "planStub" : {
+                                "@reference" : "/group/planStubs/planStub"
+                            }
+                        }, {
+                            "planRateStructureLevel" : {
+                                "@value" : "4RateStructure",
+                                "@name" : "4RateStructure",
+                                "@text" : "4RateStructure"
+                            },
+                            "ratePlanType" : {
+                                "@value" : "HealthStandard",
+                                "@name" : "HealthStandard",
+                                "@text" : "HealthStandard"
+                            },
+                            "rates" : [{
+                                    "coverageLevel" : {
+                                        "@value" : "2Adults",
+                                        "@name" : "2Adults",
+                                        "@text" : "2Adults"
+                                    },
+                                    "rate" : "0.01"
+                                }, {
+                                    "coverageLevel" : {
+                                        "@value" : "Single",
+                                        "@name" : "Single",
+                                        "@text" : "Single"
+                                    },
+                                    "rate" : "0.01"
+                                }, {
+                                    "coverageLevel" : {
+                                        "@value" : "Family",
+                                        "@name" : "Family",
+                                        "@text" : "Family"
+                                    },
+                                    "rate" : "0.01"
+                                }, {
+                                    "coverageLevel" : {
+                                        "@value" : "ParentAndChildren",
+                                        "@name" : "ParentAndChildren",
+                                        "@text" : "ParentAndChildren"
+                                    },
+                                    "rate" : "0.01"
+                                }
+                            ],
+                            "planStub" : {
+                                "@reference" : "/group/planStubs/planStub"
+                            }
+                        }
+                    ],
+                    "diseaseManagements" : [{
+                            "selectedChoiceInd" : "false",
+                            "diseaseCode" : {
+                                "@value" : "MS",
+                                "@name" : "MS",
+                                "@text" : "MS"
+                            }
+                        }, {
+                            "selectedChoiceInd" : "false",
+                            "diseaseCode" : {
+                                "@value" : "WeightManagement",
+                                "@name" : "WeightManagement",
+                                "@text" : "WeightManagement"
+                            }
+                        }, {
+                            "selectedChoiceInd" : "true",
+                            "diseaseCode" : {
+                                "@value" : "Asthma",
+                                "@name" : "Asthma",
+                                "@text" : "Asthma"
+                            }
+                        }, {
+                            "selectedChoiceInd" : "true",
+                            "diseaseCode" : {
+                                "@value" : "CHF",
+                                "@name" : "CHF",
+                                "@text" : "CHF"
+                            }
+                        }, {
+                            "selectedChoiceInd" : "true",
+                            "diseaseCode" : {
+                                "@value" : "CAD",
+                                "@name" : "CAD",
+                                "@text" : "CAD"
+                            }
+                        }, {
+                            "selectedChoiceInd" : "true",
+                            "diseaseCode" : {
+                                "@value" : "Depression",
+                                "@name" : "Depression",
+                                "@text" : "Depression"
+                            }
+                        }, {
+                            "selectedChoiceInd" : "true",
+                            "diseaseCode" : {
+                                "@value" : "COPD",
+                                "@name" : "COPD",
+                                "@text" : "COPD"
+                            }
+                        }, {
+                            "selectedChoiceInd" : "true",
+                            "diseaseCode" : {
+                                "@value" : "ESRD",
+                                "@name" : "ESRD",
+                                "@text" : "ESRD"
+                            }
+                        }, {
+                            "selectedChoiceInd" : "true",
+                            "diseaseCode" : {
+                                "@value" : "Diabetes",
+                                "@name" : "Diabetes",
+                                "@text" : "Diabetes"
+                            }
+                        }, {
+                            "selectedChoiceInd" : "false",
+                            "diseaseCode" : {
+                                "@value" : "LowBackPain",
+                                "@name" : "LowBackPain",
+                                "@text" : "LowBackPain"
+                            }
+                        }, {
+                            "selectedChoiceInd" : "false",
+                            "diseaseCode" : {
+                                "@value" : "HepatitisC",
+                                "@name" : "HepatitisC",
+                                "@text" : "HepatitisC"
+                            }
+                        }
+                    ],
+                    "planStubs" : [{
+                            "@reference" : "/group/planStubs/planStub"
+                        }
+                    ],
+                    "offerMoops" : [{
+                            "moopLob" : {
+                                "@value" : "MentalHealth",
+                                "@name" : "MentalHealth",
+                                "@text" : "MentalHealth"
+                            },
+                            "moopType" : {
+                                "@value" : "NA",
+                                "@name" : "NA",
+                                "@text" : "NA"
+                            },
+                            "owned" : "false",
+                            "vendorId" : "70",
+                            "vendorName" : "Not Applicable"
+                        }, {
+                            "moopLob" : {
+                                "@value" : "Pharmacy",
+                                "@name" : "Pharmacy",
+                                "@text" : "Pharmacy"
+                            },
+                            "moopType" : {
+                                "@value" : "NA",
+                                "@name" : "NA",
+                                "@text" : "NA"
+                            },
+                            "owned" : "false",
+                            "vendorId" : "70",
+                            "vendorName" : "Not Applicable"
+                        }, {
+                            "moopLob" : {
+                                "@value" : "HealthInstitutional",
+                                "@name" : "HealthInstitutional",
+                                "@text" : "HealthInstitutional"
+                            },
+                            "moopType" : {
+                                "@value" : "NA",
+                                "@name" : "NA",
+                                "@text" : "NA"
+                            },
+                            "owned" : "false",
+                            "vendorId" : "70",
+                            "vendorName" : "Not Applicable"
+                        }, {
+                            "moopLob" : {
+                                "@value" : "HealthProfessional",
+                                "@name" : "HealthProfessional",
+                                "@text" : "HealthProfessional"
+                            },
+                            "moopType" : {
+                                "@value" : "NA",
+                                "@name" : "NA",
+                                "@text" : "NA"
+                            },
+                            "owned" : "false",
+                            "vendorId" : "70",
+                            "vendorName" : "Not Applicable"
+                        }
+                    ]
+                }
+            ],
+            "subgroups" : [{
+                    "@groupNumPrefix" : "0085850",
+                    "@subgroupNum" : "011",
+                    "@subgroupName" : "SPORTSARENAEMPLOYEESLOCAL137WF011",
+                    "@federalTaxId" : "21-6019118",
+                    "@sicCode" : "7997",
+                    "enrollSystemCode" : {
+                        "@value" : "NMS",
+                        "@name" : "NMS",
+                        "@text" : "NMS"
+                    },
+                    "subgroupType" : {
+                        "@value" : "Health",
+                        "@name" : "Health",
+                        "@text" : "Health"
+                    },
+                    "subgroupStatus" : {
+                        "@value" : "Active",
+                        "@name" : "Active",
+                        "@text" : "Active"
+                    },
+                    "subgroupEffectiveDate" : {
+                        "@year" : "2013",
+                        "@month" : "7",
+                        "@day" : "1"
+                    },
+                    "fundingCode" : {
+                        "@value" : "FullyInsured",
+                        "@name" : "FullyInsured",
+                        "@text" : "FullyInsured"
+                    },
+                    "sendContractToCode" : {
+                        "@value" : "Broker",
+                        "@name" : "Broker",
+                        "@text" : "Broker"
+                    },
+                    "orgEffectDate" : {
+                        "@year" : "2012",
+                        "@month" : "2",
+                        "@day" : "1"
+                    },
+                    "thirdPartyLiability" : {
+                        "autoInsCoordination" : {
+                            "@value" : "NJLawPersonalInjuryProtection",
+                            "@name" : "NJLawPersonalInjuryProtection",
+                            "@text" : "NJLawPersonalInjuryProtection"
+                        }
+                    },
+                    "erisa" : {
+                        "@erisaPlanAdmin" : "Sports Arena EE's Lo",
+                        "@erisaPlanAdminTitle" : "Bd of Trustees",
+                        "@erisaPlanCodeNum" : "501",
+                        "erisaPlanYear" : {
+                            "@value" : "JanuaryDecember",
+                            "@name" : "JanuaryDecember",
+                            "@text" : "JanuaryDecember"
+                        }
+                    },
+                    "unionAffiliation" : {
+                        "@unionLocalNum" : "137",
+                        "@internationalName" : "SPORTS ARENA EMPLOYEES LOCAL 137 WELFARE FUND"
+                    },
+                    "healthCareReform" : {
+                        "grandfatheringStatus" : {
+                            "@value" : "No",
+                            "@name" : "No",
+                            "@text" : "No"
+                        },
+                        "externalAppealsProcess" : {
+                            "@value" : "No",
+                            "@name" : "No",
+                            "@text" : "No"
+                        },
+                        "horizonManagesAppeals" : {
+                            "@value" : "NotApplicable",
+                            "@name" : "NotApplicable",
+                            "@text" : "NotApplicable"
+                        },
+                        "languageDocumentation" : {
+                            "@value" : "No",
+                            "@name" : "No",
+                            "@text" : "No"
+                        },
+                        "attestReceivedInd" : "false"
+                    },
+                    "subgroupToDepartments" : [],
+                    "parPlan" : {
+                        "parPlanCodes" : [{
+                                "parPlanCode" : {
+                                    "@value" : "BCBSOfMassachusetts",
+                                    "@name" : "BCBSOfMassachusetts",
+                                    "@text" : "BCBSOfMassachusetts"
+                                },
+                                "parPlanCodeInd" : "false"
+                            }, {
+                                "parPlanCode" : {
+                                    "@value" : "CarefirstMaryland",
+                                    "@name" : "CarefirstMaryland",
+                                    "@text" : "CarefirstMaryland"
+                                },
+                                "parPlanCodeInd" : "false"
+                            }, {
+                                "parPlanCode" : {
+                                    "@value" : "BSOfCalifornia",
+                                    "@name" : "BSOfCalifornia",
+                                    "@text" : "BSOfCalifornia"
+                                },
+                                "parPlanCodeInd" : "false"
+                            }
+                        ],
+                        "parPlanLOBs" : [{
+                                "parPlanLOB" : {
+                                    "@value" : "POS",
+                                    "@name" : "POS",
+                                    "@text" : "POS"
+                                },
+                                "parPlanLOBInd" : "false"
+                            }, {
+                                "parPlanLOB" : {
+                                    "@value" : "EPO",
+                                    "@name" : "EPO",
+                                    "@text" : "EPO"
+                                },
+                                "parPlanLOBInd" : "false"
+                            }, {
+                                "parPlanLOB" : {
+                                    "@value" : "Hospital",
+                                    "@name" : "Hospital",
+                                    "@text" : "Hospital"
+                                },
+                                "parPlanLOBInd" : "false"
+                            }, {
+                                "parPlanLOB" : {
+                                    "@value" : "Horizon PPO",
+                                    "@name" : "Horizon PPO",
+                                    "@text" : "Horizon PPO"
+                                },
+                                "parPlanLOBInd" : "false"
+                            }, {
+                                "parPlanLOB" : {
+                                    "@value" : "MedicalSurgical",
+                                    "@name" : "MedicalSurgical",
+                                    "@text" : "MedicalSurgical"
+                                },
+                                "parPlanLOBInd" : "false"
+                            }, {
+                                "parPlanLOB" : {
+                                    "@value" : "MajorMedical",
+                                    "@name" : "MajorMedical",
+                                    "@text" : "MajorMedical"
+                                },
+                                "parPlanLOBInd" : "false"
+                            }, {
+                                "parPlanLOB" : {
+                                    "@value" : "CMM",
+                                    "@name" : "CMM",
+                                    "@text" : "CMM"
+                                },
+                                "parPlanLOBInd" : "false"
+                            }
+                        ],
+                        "processingReqs" : [{
+                                "processingReq" : {
+                                    "@value" : "ClaimsProcess",
+                                    "@name" : "ClaimsProcess",
+                                    "@text" : "ClaimsProcess"
+                                },
+                                "processingReqInd" : "false"
+                            }, {
+                                "processingReq" : {
+                                    "@value" : "ProviderServ",
+                                    "@name" : "ProviderServ",
+                                    "@text" : "ProviderServ"
+                                },
+                                "processingReqInd" : "false"
+                            }, {
+                                "processingReq" : {
+                                    "@value" : "ManagedCareCentralAdminNJ",
+                                    "@name" : "ManagedCareCentralAdminNJ",
+                                    "@text" : "ManagedCareCentralAdminNJ"
+                                },
+                                "processingReqInd" : "false"
+                            }, {
+                                "processingReq" : {
+                                    "@value" : "ManagedCare",
+                                    "@name" : "ManagedCare",
+                                    "@text" : "ManagedCare"
+                                },
+                                "processingReqInd" : "false"
+                            }, {
+                                "processingReq" : {
+                                    "@value" : "CustomerServ",
+                                    "@name" : "CustomerServ",
+                                    "@text" : "CustomerServ"
+                                },
+                                "processingReqInd" : "false"
+                            }
+                        ]
+                    },
+                    "insuredProbationaryPeriodLOBs" : {
+                        "insuredProbationaryPeriodLOB" : {
+                            "lob" : {
+                                "@value" : "Health",
+                                "@name" : "Health",
+                                "@text" : "Health"
+                            },
+                            "insuredProbationaryPeriods" : {
+                                "insuredProbationaryPeriod" : {
+                                    "@classOtherDesc" : "Other, see below",
+                                    "@newHiresDesc" : "Coverage shall be effective for eligible members according to provisions of the applicable collective bargaining agreement.  Thus, the Fund determines eligibility and enrollment",
+                                    "classTypeCode" : {
+                                        "@value" : "Class1",
+                                        "@name" : "Class1",
+                                        "@text" : "Class1"
+                                    },
+                                    "classDesc" : {
+                                        "@value" : "Other",
+                                        "@name" : "Other",
+                                        "@text" : "Other"
+                                    },
+                                    "newHiresCode" : {
+                                        "@value" : "Other",
+                                        "@name" : "Other",
+                                        "@text" : "Other"
+                                    },
+                                    "rehiresType" : {
+                                        "@value" : "SameAsNew",
+                                        "@name" : "SameAsNew",
+                                        "@text" : "SameAsNew"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "insuredTypes" : {
+                        "insuredType" : {
+                            "lob" : {
+                                "@value" : "Health",
+                                "@name" : "Health",
+                                "@text" : "Health"
+                            },
+                            "activeEmplInd" : "true",
+                            "active" : {
+                                "fullTimeEmplInd" : "false",
+                                "permPartTimeEmplInd" : "false",
+                                "hoursPerWeekEmplHours" : "40.0",
+                                "hoursPerWeekEmplInd" : "true",
+                                "salariedEmplInd" : "false",
+                                "hourlyEmplInd" : "false",
+                                "longTermDisabilityInd" : "false"
+                            },
+                            "retireeInd" : "true",
+                            "retiree" : {
+                                "currentInd" : "false",
+                                "futureInd" : "true",
+                                "over65Ind" : "false",
+                                "under65Ind" : "false"
+                            },
+                            "survivalSpouseInd" : "false",
+                            "cobraInd" : "false",
+                            "dependentTo31Ind" : "false"
+                        }
+                    },
+                    "enrollment" : {
+                        "emplNumReqInd" : "false",
+                        "payrollLocationReqInd" : "false",
+                        "rptSequenceCode" : {
+                            "@value" : "AlphaOrder",
+                            "@name" : "AlphaOrder",
+                            "@text" : "AlphaOrder"
+                        },
+                        "medicareEnrollment" : {
+                            "merGroupSize" : {
+                                "@value" : "OneTo19",
+                                "@name" : "OneTo19",
+                                "@text" : "OneTo19"
+                            },
+                            "merGroupSizeEffDate" : {
+                                "@year" : "2012",
+                                "@month" : "2",
+                                "@day" : "1"
+                            },
+                            "merGroupSizeTermDate" : {
+                                "@year" : "9999",
+                                "@month" : "12",
+                                "@day" : "31"
+                            },
+                            "cmsReportReqInd" : "false",
+                            "cmsSubmitFileInd" : "false"
+                        },
+                        "enrollmentToLOBs" : {
+                            "enrollmentToLob" : {
+                                "lob" : {
+                                    "@value" : "Health",
+                                    "@name" : "Health",
+                                    "@text" : "Health"
+                                },
+                                "supplEnrollmentDateMmCode" : {
+                                    "@value" : "July",
+                                    "@name" : "July",
+                                    "@text" : "July"
+                                },
+                                "supplEnrollmentDateDdCode" : {
+                                    "@value" : "1",
+                                    "@name" : "1",
+                                    "@text" : "1"
+                                },
+                                "supplEnrollmentFrequency" : {
+                                    "@value" : "Annual",
+                                    "@name" : "Annual",
+                                    "@text" : "Annual"
+                                },
+                                "initMembershipCode" : {
+                                    "@value" : "PaperApplications",
+                                    "@name" : "PaperApplications",
+                                    "@text" : "PaperApplications"
+                                },
+                                "maintMembershipCode" : {
+                                    "@value" : "PaperApplications",
+                                    "@name" : "PaperApplications",
+                                    "@text" : "PaperApplications"
+                                },
+                                "initMemPaperApplCnt" : "290"
+                            }
+                        }
+                    },
+                    "eligibilities" : {
+                        "eligibility" : {
+                            "lob" : {
+                                "@value" : "Health",
+                                "@name" : "Health",
+                                "@text" : "Health"
+                            },
+                            "eligEmplCnt" : "290",
+                            "enrollEmplCount" : "290",
+                            "civilUnionInd" : "true",
+                            "domPartnerCovInd" : "true",
+                            "domPartnerCovType" : {
+                                "@value" : "SameSexOnly",
+                                "@name" : "SameSexOnly",
+                                "@text" : "SameSexOnly"
+                            },
+                            "subscriberOnlyInd" : "false",
+                            "civilUnionCOBRACovInd" : "false",
+                            "insuredTerms" : [{
+                                    "dependentCovAgeCode" : {
+                                        "@value" : "TwentySix",
+                                        "@name" : "TwentySix",
+                                        "@text" : "TwentySix"
+                                    },
+                                    "insuredType" : {
+                                        "@value" : "Handicap",
+                                        "@name" : "Handicap",
+                                        "@text" : "Handicap"
+                                    }
+                                }, {
+                                    "insuredTermDateTypeCode" : {
+                                        "@value" : "EndOfBenefitMonth",
+                                        "@name" : "EndOfBenefitMonth",
+                                        "@text" : "EndOfBenefitMonth"
+                                    },
+                                    "insuredType" : {
+                                        "@value" : "Employee",
+                                        "@name" : "Employee",
+                                        "@text" : "Employee"
+                                    }
+                                }, {
+                                    "dependentCovAgeCode" : {
+                                        "@value" : "TwentySix",
+                                        "@name" : "TwentySix",
+                                        "@text" : "TwentySix"
+                                    },
+                                    "insuredTermDateTypeCode" : {
+                                        "@value" : "EndOfMonthAfterBirthday",
+                                        "@name" : "EndOfMonthAfterBirthday",
+                                        "@text" : "EndOfMonthAfterBirthday"
+                                    },
+                                    "insuredType" : {
+                                        "@value" : "Student",
+                                        "@name" : "Student",
+                                        "@text" : "Student"
+                                    }
+                                }, {
+                                    "dependentCovAgeCode" : {
+                                        "@value" : "TwentySix",
+                                        "@name" : "TwentySix",
+                                        "@text" : "TwentySix"
+                                    },
+                                    "insuredTermDateTypeCode" : {
+                                        "@value" : "EndOfMonthAfterBirthday",
+                                        "@name" : "EndOfMonthAfterBirthday",
+                                        "@text" : "EndOfMonthAfterBirthday"
+                                    },
+                                    "insuredType" : {
+                                        "@value" : "Dependent",
+                                        "@name" : "Dependent",
+                                        "@text" : "Dependent"
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "contactRoles" : [{
+                            "@billName" : "",
+                            "roleType" : {
+                                "@value" : "Primary",
+                                "@name" : "Primary",
+                                "@text" : "Primary"
+                            },
+                            "brokerLOB" : {
+                                "@value" : "Health",
+                                "@name" : "Health",
+                                "@text" : "Health"
+                            },
+                            "address" : {
+                                "@reference" : "/group/addresses/address"
+                            },
+                            "contact" : {
+                                "@reference" : "/group/contacts/broker"
+                            }
+                        }, {
+                            "@billName" : "",
+                            "address" : {
+                                "@reference" : "/group/addresses/address[2]"
+                            },
+                            "contact" : {
+                                "@reference" : "/group/contacts/billing"
+                            }
+                        }, {
+                            "@billName" : "",
+                            "roleType" : {
+                                "@value" : "CompanyOfficial",
+                                "@name" : "CompanyOfficial",
+                                "@text" : "CompanyOfficial"
+                            },
+                            "address" : {
+                                "@reference" : "/group/addresses/address[2]"
+                            },
+                            "contact" : {
+                                "@reference" : "/group/contacts/contact[2]"
+                            }
+                        }
+                    ],
+                    "assignments" : [{
+                            "assignmentEffectiveDate" : {
+                                "@year" : "2015",
+                                "@month" : "1",
+                                "@day" : "1"
+                            },
+                            "assignmentStatus" : {
+                                "@value" : "Active",
+                                "@name" : "Active",
+                                "@text" : "Active"
+                            },
+                            "offer" : {
+                                "@reference" : "/group/offers/offer"
+                            }
+                        }
+                    ],
+                    "subrogation" : [],
+                    "idCards" : {
+                        "idCard" : {
+                            "lob" : {
+                                "@value" : "Health",
+                                "@name" : "Health",
+                                "@text" : "Health"
+                            },
+                            "noCardInd" : "false",
+                            "customCardReqInd" : "false",
+                            "logoReqInd" : "false",
+                            "unionBugInd" : "false",
+                            "producerCode" : {
+                                "@value" : "BCBSNJ",
+                                "@name" : "BCBSNJ",
+                                "@text" : "BCBSNJ"
+                            },
+                            "routingCode" : {
+                                "@value" : "MailToSubscriber",
+                                "@name" : "MailToSubscriber",
+                                "@text" : "MailToSubscriber"
+                            },
+                            "sequenceCode" : {
+                                "@value" : "Alpha",
+                                "@name" : "Alpha",
+                                "@text" : "Alpha"
+                            },
+                            "bookletDraftReviewInd" : "false"
+                        }
+                    },
+                    "emplContributionPercentages" : [{
+                            "lob" : {
+                                "@value" : "Health",
+                                "@name" : "Health",
+                                "@text" : "Health"
+                            },
+                            "emplContributionAmount" : "0.0",
+                            "emplContributionPercent" : "75.0"
+                        }, {
+                            "lob" : {
+                                "@value" : "PrescriptionPlan",
+                                "@name" : "PrescriptionPlan",
+                                "@text" : "PrescriptionPlan"
+                            },
+                            "emplContributionAmount" : "0.0",
+                            "emplContributionPercent" : "0.0"
+                        }
+                    ],
+                    "subgroupToLOBs" : [{
+                            "lob" : {
+                                "@value" : "Health",
+                                "@name" : "Health",
+                                "@text" : "Health"
+                            },
+                            "anniversaryDateMmCode" : {
+                                "@value" : "July",
+                                "@name" : "July",
+                                "@text" : "July"
+                            },
+                            "anniversaryDateDdCode" : {
+                                "@value" : "1",
+                                "@name" : "1",
+                                "@text" : "1"
+                            },
+                            "firstRenewDate" : {
+                                "@year" : "2012",
+                                "@month" : "7",
+                                "@day" : "1"
+                            },
+                            "subsequentContractPeriod" : "12",
+                            "performanceGuaranteeInd" : "false",
+                            "specialFinancialArrangInd" : "false"
+                        }, {
+                            "lob" : {
+                                "@value" : "PrescriptionPlan",
+                                "@name" : "PrescriptionPlan",
+                                "@text" : "PrescriptionPlan"
+                            },
+                            "performanceGuaranteeInd" : "false",
+                            "specialFinancialArrangInd" : "false"
+                        }
+                    ],
+                    "bulkTransferReqInd" : "false",
+                    "religiousEmplInd" : "false",
+                    "subrogationInd" : "false",
+                    "unionInd" : "true",
+                    "erisaInd" : "true",
+                    "parPlanInd" : "false",
+                    "priorCarrierCarryoverInd" : "false",
+                    "claimFiduciaryInd" : "false",
+                    "subgroupToPlans" : []
+                }
+            ],
+            "groupSubmit" : {
+                "@accountImplementation" : "Singleton,Lynn",
+                "@underwriter" : "Triner,David",
+                "@customerContactName" : "N/A",
+                "@comment" : "Change of Group COntact & Group Address, as of 01/01/2015.",
+                "customerSignOffDate" : {
+                    "@year" : "2013",
+                    "@month" : "12",
+                    "@day" : "9"
+                },
+                "txnType" : {
+                    "@value" : "EligibilityChange",
+                    "@name" : "EligibilityChange",
+                    "@text" : "EligibilityChange"
+                },
+                "runoutPeriodHmo" : {
+                    "@value" : "12",
+                    "@name" : "12",
+                    "@text" : "12"
+                },
+                "runoutPeriodNonHmo" : {
+                    "@value" : "18",
+                    "@name" : "18",
+                    "@text" : "18"
+                },
+                "runoutPeriodDentalFullyins" : {
+                    "@value" : "12",
+                    "@name" : "12",
+                    "@text" : "12"
+                },
+                "txnEffectDate" : {
+                    "@year" : "2015",
+                    "@month" : "1",
+                    "@day" : "1"
+                }
+            }
+        }
+
++ Response 404
+
+    + Headers
+    
+            X-PlanGroupService-Error-Cause: potential cause of the error
+
++ Response 500
+
+    + Headers
+    
+            X-PlanGroupService-Error-Cause: potential cause of the error
